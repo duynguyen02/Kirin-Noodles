@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".presentation.main.MainActivity">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/kirin_spicy_noodles_logo"
+        android:scaleType="centerCrop"
+        android:src="@drawable/vector_background" />
+
+    <FrameLayout
+        android:id="@+id/fl_main_a_fragments_holder"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/bnv_main_a_main"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+<!--    <com.google.android.material.bottomnavigation.BottomNavigationView-->
+<!--        android:id="@+id/bnv_main_a_main"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:background="@android:color/transparent"-->
+<!--        android:backgroundTint="@color/white"-->
+<!--        app:itemBackground="@drawable/border_black_corner"-->
+<!--        app:itemIconTint="@drawable/bottom_navigation_selector"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:menu="@menu/menu_main_bottom_navigation" />-->
+
+    <me.ibrahimsn.lib.SmoothBottomBar
+        android:id="@+id/bnv_main_a_main"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        app:backgroundColor="#83bbb7"
+        app:textColor="@color/black"
+        app:iconTint="@color/black"
+        app:iconTintActive="@color/black"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/menu_main_bottom_navigation" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

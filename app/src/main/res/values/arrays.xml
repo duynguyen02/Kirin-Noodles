@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="kirin_noodles_resources">
+        <item>Đồ Ăn</item>
+        <item>Bàn</item>
+    </string-array>
+    <string-array name="invoice_options">
+        <item>Chi Tiết Đơn Hàng</item>
+        <item>Chuyển Đổi Trạng Thái Đơn Hàng</item>
+        <item>Gửi Đơn</item>
+    </string-array>
+</resources>

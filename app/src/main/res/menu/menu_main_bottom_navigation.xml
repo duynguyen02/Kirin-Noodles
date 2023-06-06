@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_main_order"
+        android:icon="@drawable/ic_restaurant"
+        android:title="@string/order" />
+    <item
+        android:id="@+id/menu_main_management"
+        android:icon="@drawable/ic_playlist_add"
+        android:title="@string/management" />
+    <item
+        android:id="@+id/menu_main_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/settings" />
+</menu>

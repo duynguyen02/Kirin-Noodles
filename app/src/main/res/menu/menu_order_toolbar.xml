@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+<!--    <item-->
+<!--        android:id="@+id/menu_order_add_order"-->
+<!--        android:icon="@drawable/ic_add"-->
+<!--        app:showAsAction="ifRoom"-->
+<!--        android:title="@string/add" />-->
+
+    <item
+        android:id="@+id/menu_order_delete_order"
+        android:icon="@drawable/delete_bill"
+        app:showAsAction="always"
+        android:title="@string/delete" />
+
+</menu>

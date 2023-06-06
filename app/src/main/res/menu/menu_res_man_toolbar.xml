@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_res_man_delete_item"
+        android:icon="@drawable/delete_button"
+        app:showAsAction="always"
+        android:title="@string/kirin_spicy_noodles_logo" />
+
+</menu>
