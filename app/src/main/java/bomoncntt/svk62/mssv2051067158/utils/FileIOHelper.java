@@ -13,6 +13,7 @@ public class FileIOHelper {
     private static FileIOHelper instance = null;
 
     private final String appDir;
+    private final File cacheDir;
 
     public static synchronized FileIOHelper getInstance(Context context){
         if(instance == null){
@@ -23,6 +24,7 @@ public class FileIOHelper {
 
     private FileIOHelper(Context context){
         appDir = context.getApplicationContext().getFilesDir().toString();
+        cacheDir = context.getCacheDir();
     }
 
     public synchronized File copyImageToApplication(Bitmap bitmap, String folder){
@@ -62,6 +64,23 @@ public class FileIOHelper {
 
     }
 
+    public synchronized void deleteCache(){
+        if (cacheDir != null && cacheDir.isDirectory()) {
+            deleteDirectory(cacheDir);
+            cacheDir.mkdir();
+        }
+    }
 
+    private void deleteDirectory(File file) {
+        if (file.isDirectory()) {
+            File[] children = file.listFiles();
+            if (children != null) {
+                for (File child : children) {
+                    deleteDirectory(child);
+                }
+            }
+        }
+        file.delete();
+    }
 
 }

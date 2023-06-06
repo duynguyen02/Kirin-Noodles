@@ -24,11 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bomoncntt.svk62.mssv2051067158.R;
-import bomoncntt.svk62.mssv2051067158.data.local.KirinNoodlesSQLiteHelper;
-import bomoncntt.svk62.mssv2051067158.data.local.repository.DishRepositoryImpl;
-import bomoncntt.svk62.mssv2051067158.data.local.repository.InvoiceRepositoryImpl;
-import bomoncntt.svk62.mssv2051067158.data.local.repository.OrderedDishRepositoryImpl;
-import bomoncntt.svk62.mssv2051067158.data.local.repository.TableLocationRepositoryImpl;
+import bomoncntt.svk62.mssv2051067158.data.local.repository.factory.LocalRepositoryFactory;
 import bomoncntt.svk62.mssv2051067158.databinding.FragmentResourcesManagementBinding;
 import bomoncntt.svk62.mssv2051067158.domain.models.Dish;
 import bomoncntt.svk62.mssv2051067158.domain.models.TableLocation;
@@ -84,13 +80,16 @@ public class ResourcesManagementFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+        getDependenciesInstance();
+    }
+
+    private void getDependenciesInstance() {
         fragmentActivity = requireActivity();
-        KirinNoodlesSQLiteHelper kirinNoodlesSQLiteHelper = KirinNoodlesSQLiteHelper.getInstance(fragmentActivity);
-        dishRepository = DishRepositoryImpl.getInstance(kirinNoodlesSQLiteHelper);
-        tableLocationRepository = TableLocationRepositoryImpl.getInstance(kirinNoodlesSQLiteHelper);
-        orderedDishRepository = OrderedDishRepositoryImpl.getInstance(kirinNoodlesSQLiteHelper);
-        invoiceRepository = InvoiceRepositoryImpl.getInstance(kirinNoodlesSQLiteHelper);
-        
+
+        dishRepository = (DishRepository) LocalRepositoryFactory.getInstance(LocalRepositoryFactory.RepositoryType.DISH);
+        tableLocationRepository = (TableLocationRepository) LocalRepositoryFactory.getInstance(LocalRepositoryFactory.RepositoryType.TABLE_LOCATION);
+        orderedDishRepository = (OrderedDishRepository) LocalRepositoryFactory.getInstance(LocalRepositoryFactory.RepositoryType.ORDERED_DISH);
+        invoiceRepository = (InvoiceRepository) LocalRepositoryFactory.getInstance(LocalRepositoryFactory.RepositoryType.INVOICE);
     }
 
     @Override
@@ -109,9 +108,7 @@ public class ResourcesManagementFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 int textLength = s.length();
                 int index = getSpinnerIndex();
-
                 ArrayAdapter adapter = null;
-
                 if (index == 0) {
                     ArrayList<Dish> dishesTemp = new ArrayList<>();
 
@@ -123,7 +120,7 @@ public class ResourcesManagementFragment extends Fragment {
                         }
                     }
 
-                    adapter = new DishAdapter(fragmentActivity, dishesTemp, getChildFragmentManager(), dishRepository);
+                    adapter = new DishAdapter(fragmentActivity, dishesTemp, getChildFragmentManager());
                     dishAdapter = (DishAdapter) adapter;
 
                 } else if (index == 1) {
@@ -137,13 +134,10 @@ public class ResourcesManagementFragment extends Fragment {
                         }
                     }
 
-                    adapter = new TableLocationAdapter(fragmentActivity, tableLocationsTemp, tableLocationRepository, getChildFragmentManager());
+                    adapter = new TableLocationAdapter(fragmentActivity, tableLocationsTemp, getChildFragmentManager());
                     tableLocationAdapter = (TableLocationAdapter) adapter;
                 }
-
                 binding.lvResManFResTypes.setAdapter(adapter);
-
-
             }
 
             @Override
@@ -154,69 +148,72 @@ public class ResourcesManagementFragment extends Fragment {
 
     private void toolbarSetup() {
         binding.tbResManF.setOnMenuItemClickListener(item -> {
-
             if (item.getItemId() == R.id.menu_res_man_delete_item) {
-                deleteItems();
+                confirmDelete();
             }
-
             return true;
         });
     }
 
-    private void deleteItems() {
+    private void confirmDelete() {
         int index = getSpinnerIndex();
         List<Dish> dishes = null;
         List<TableLocation> tableLocations = null;
 
+        boolean validCheck = false;
         if (index == 0) {
             dishes = dishAdapter.getChecked();
+            validCheck = dishes.size() > 0;
         } else if (index == 1) {
             tableLocations = tableLocationAdapter.getChecked();
+            validCheck = tableLocations.size() > 0;
         }
+
+        if (!validCheck) {
+            Toast.makeText(fragmentActivity, "Vui Lòng Chọn Đối Tượng Cần Xóa.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(fragmentActivity);
         List<Dish> finalDishes = dishes;
         List<TableLocation> finalTableLocations = tableLocations;
         builder.setMessage("Bạn có muốn xóa các mục đã chọn?")
                 .setPositiveButton("Có", (dialog, which) -> {
-
-                    boolean wasSuccessful = false;
-
                     if (index == 0) {
-                        for (Dish dish : finalDishes) {
-                            if (orderedDishRepository.isDishExist(dish.getDishID())){
-                                wasSuccessful = false;
-                            }
-                            else {
-                                wasSuccessful = dishRepository.deleteDish(dish.getDishID());
-                            }
-                            if (wasSuccessful) {
-                                FileIOHelper.getInstance(fragmentActivity).deleteFile(dish.getImageLocation());
-                            }
-                            foodsListviewSetup();
-                        }
-                    } else if (index == 1) {
-                        for (TableLocation tableLocation : finalTableLocations) {
-                            if (invoiceRepository.isTableLocationExist(tableLocation)){
-                                wasSuccessful = false;
-                            }
-                            else {
-                                wasSuccessful = tableLocationRepository.deleteTableLocation(tableLocation.getTableID());
-                            }
-
-                            tableLocationSetup();
-                        }
-                    }
-
-                    if (wasSuccessful) {
-                        Toast.makeText(requireActivity(), "Xóa thành công!", Toast.LENGTH_SHORT).show();
+                        deleteDishes(finalDishes);
                     } else {
-                        Toast.makeText(requireActivity(), "Xóa thất bại!", Toast.LENGTH_SHORT).show();
+                        deleteTableLocations(finalTableLocations);
                     }
                 })
                 .setNegativeButton("Không", (dialog, which) -> dialog.dismiss())
                 .create()
                 .show();
+    }
+
+    private void deleteDishes(List<Dish> finalDishes) {
+        boolean wasSuccessful;
+        FileIOHelper fileIOHelper = FileIOHelper.getInstance(fragmentActivity);
+        for (Dish dish : finalDishes) {
+            if (orderedDishRepository.isDishExist(dish.getDishID())) {
+                wasSuccessful = false;
+            } else {
+                wasSuccessful = dishRepository.deleteDish(dish.getDishID());
+            }
+            if (wasSuccessful) {
+                fileIOHelper.deleteFile(dish.getImageLocation());
+            }
+            foodsListviewSetup();
+        }
+    }
+
+    private void deleteTableLocations(List<TableLocation> finalTableLocations) {
+        for (TableLocation tableLocation : finalTableLocations) {
+            if (!invoiceRepository.isTableLocationExist(tableLocation)) {
+                tableLocationRepository.deleteTableLocation(tableLocation.getTableID());
+            }
+            tableLocationSetup();
+        }
     }
 
 
@@ -287,13 +284,13 @@ public class ResourcesManagementFragment extends Fragment {
 
     private void tableLocationSetup() {
         tableLocations = tableLocationRepository.getAllTableLocations();
-        tableLocationAdapter = new TableLocationAdapter(fragmentActivity, tableLocations, tableLocationRepository, getChildFragmentManager());
+        tableLocationAdapter = new TableLocationAdapter(fragmentActivity, tableLocations, getChildFragmentManager());
         binding.lvResManFResTypes.setAdapter(tableLocationAdapter);
     }
 
     private void foodsListviewSetup() {
         dishes = dishRepository.getAllDishes();
-        dishAdapter = new DishAdapter(fragmentActivity, dishes, getChildFragmentManager(), dishRepository);
+        dishAdapter = new DishAdapter(fragmentActivity, dishes, getChildFragmentManager());
         binding.lvResManFResTypes.setAdapter(dishAdapter);
     }
 

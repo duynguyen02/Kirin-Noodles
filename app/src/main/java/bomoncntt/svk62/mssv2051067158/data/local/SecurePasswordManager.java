@@ -35,6 +35,9 @@ public class SecurePasswordManager {
             editor.putString(PASSWORD_KEY, password);
             editor.apply();
         }
+        else {
+            throw new IllegalStateException("SecurePasswordManager has not been initialized. Call init() first.");
+        }
     }
 
     public static void setLoginWithPassword(boolean isLoginWithPassword){
@@ -42,6 +45,9 @@ public class SecurePasswordManager {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean(LOGIN_WITH_PASSWORD, isLoginWithPassword);
             editor.apply();
+        }
+        else {
+            throw new IllegalStateException("SecurePasswordManager has not been initialized. Call init() first.");
         }
     }
 
@@ -65,6 +71,9 @@ public class SecurePasswordManager {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.remove(PASSWORD_KEY);
             editor.apply();
+        }
+        else {
+            throw new IllegalStateException("SecurePasswordManager has not been initialized. Call init() first.");
         }
     }
 }

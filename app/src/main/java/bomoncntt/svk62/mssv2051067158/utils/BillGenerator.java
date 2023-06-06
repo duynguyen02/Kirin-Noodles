@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Date;
+import java.util.concurrent.CompletableFuture;
 
 import bomoncntt.svk62.mssv2051067158.R;
 import bomoncntt.svk62.mssv2051067158.domain.models.Dish;
@@ -39,6 +40,7 @@ public class BillGenerator {
     private static final int FONT_SIZE_TABLE = 12;
 
     public static File createBill(Order order, Context context){
+
         context = context.getApplicationContext();
         String tempBillFileName = "BILL_" + System.currentTimeMillis() + ".pdf";
         Document document = new Document();
@@ -49,12 +51,12 @@ public class BillGenerator {
             }
             document.open();
             BaseFont baseFont = BaseFont.createFont("assets/font/roboto.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-            Font titleFont = new Font(baseFont, FONT_SIZE_TITLE);
-            Font headerFont = new Font(baseFont, FONT_SIZE_HEADER);
+            Font titleFont = new Font(baseFont, FONT_SIZE_TITLE, Font.BOLD);
+            Font headerFont = new Font(baseFont, FONT_SIZE_HEADER, Font.BOLD);
             Font contentFont = new Font(baseFont, FONT_SIZE_CONTENT);
             Font totalFont = new Font(baseFont, FONT_SIZE_TOTAL, Font.BOLD);
-            Font tableFont = new Font(baseFont, FONT_SIZE_TABLE);
-
+            Font tableHeaderFont = new Font(baseFont, FONT_SIZE_TABLE, Font.BOLD);
+            Font tableRowFont = new Font(baseFont, FONT_SIZE_TABLE);
 
 
             Bitmap imageBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.cat_logo);
@@ -90,14 +92,14 @@ public class BillGenerator {
             table.setSpacingBefore(20f);
             table.setSpacingAfter(20f);
 
-            addTableHeader(table, tableFont,"Tên Món", "SL", "Đơn Giá", "Ghi Chú");
+            addTableHeader(table, tableHeaderFont,"Tên Món", "SL", "Đơn Giá", "Ghi Chú");
 
             for(Dish dish : order.getOrderMap().keySet()){
                 OrderedDish orderedDish = order.getOrderMap().get(dish);
                 assert orderedDish != null;
                 addTableRow(
                         table,
-                        tableFont,
+                        tableRowFont,
                         dish.getDishName(),
                         String.valueOf(orderedDish.getQuantity()),
                         CurrencyHelper.currencyConverter(dish.getPrice()),
@@ -118,6 +120,7 @@ public class BillGenerator {
             document.close();
 
             return tempFile;
+
 
         } catch (Exception e) {
             e.printStackTrace();

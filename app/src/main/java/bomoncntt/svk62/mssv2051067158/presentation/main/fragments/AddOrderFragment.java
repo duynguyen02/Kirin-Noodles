@@ -30,6 +30,7 @@ import bomoncntt.svk62.mssv2051067158.data.local.repository.DishRepositoryImpl;
 import bomoncntt.svk62.mssv2051067158.data.local.repository.InvoiceRepositoryImpl;
 import bomoncntt.svk62.mssv2051067158.data.local.repository.OrderRepositoryImpl;
 import bomoncntt.svk62.mssv2051067158.data.local.repository.TableLocationRepositoryImpl;
+import bomoncntt.svk62.mssv2051067158.data.local.repository.factory.LocalRepositoryFactory;
 import bomoncntt.svk62.mssv2051067158.databinding.FragmentAddOrderBinding;
 import bomoncntt.svk62.mssv2051067158.domain.models.Dish;
 import bomoncntt.svk62.mssv2051067158.domain.models.Invoice;
@@ -39,6 +40,7 @@ import bomoncntt.svk62.mssv2051067158.domain.models.TableLocation;
 import bomoncntt.svk62.mssv2051067158.domain.repository.DishRepository;
 import bomoncntt.svk62.mssv2051067158.domain.repository.InvoiceRepository;
 import bomoncntt.svk62.mssv2051067158.domain.repository.OrderRepository;
+import bomoncntt.svk62.mssv2051067158.domain.repository.OrderedDishRepository;
 import bomoncntt.svk62.mssv2051067158.domain.repository.TableLocationRepository;
 import bomoncntt.svk62.mssv2051067158.presentation.main.adapters.FoodsOrderedAdapter;
 import bomoncntt.svk62.mssv2051067158.utils.CurrencyHelper;
@@ -63,18 +65,20 @@ public class AddOrderFragment  extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        fragmentActivity = requireActivity();
-        KirinNoodlesSQLiteHelper helper = KirinNoodlesSQLiteHelper.getInstance(fragmentActivity);
+        getDependenciesInstance();
+    }
 
-        tableLocationRepository = TableLocationRepositoryImpl.getInstance(helper);
-        dishRepository = DishRepositoryImpl.getInstance(helper);
-        invoiceRepository = InvoiceRepositoryImpl.getInstance(helper);
-        orderRepository = OrderRepositoryImpl.getInstance(helper);
+    private void getDependenciesInstance(){
+        fragmentActivity = requireActivity();
+
+        dishRepository = (DishRepository) LocalRepositoryFactory.getInstance(LocalRepositoryFactory.RepositoryType.DISH);
+        tableLocationRepository = (TableLocationRepository) LocalRepositoryFactory.getInstance(LocalRepositoryFactory.RepositoryType.TABLE_LOCATION);
+        invoiceRepository = (InvoiceRepository) LocalRepositoryFactory.getInstance(LocalRepositoryFactory.RepositoryType.INVOICE);
+        orderRepository = (OrderRepository) LocalRepositoryFactory.getInstance(LocalRepositoryFactory.RepositoryType.ORDER);
 
         int invoiceMaxId = invoiceRepository.getMaxId();
         invoice = new Invoice(invoiceMaxId == -1 ? 0 : invoiceMaxId + 1, 0, new Date(), -1, Invoice.PaymentStatus.PREPARING);
         order = new Order(invoice, null);
-
     }
 
     @Override
@@ -102,7 +106,7 @@ public class AddOrderFragment  extends Fragment {
         });
 
         binding.tbAddOrderF.setOnMenuItemClickListener(item -> {
-            fragmentActivity.getSupportFragmentManager().beginTransaction().replace(R.id.fl_main_a_fragments_holder, new OrderFragment()).commit();
+            openOrderFragment();
             return true;
         });
 
@@ -114,6 +118,10 @@ public class AddOrderFragment  extends Fragment {
         listviewSetup();
 
         return binding.getRoot();
+    }
+
+    private void openOrderFragment() {
+        fragmentActivity.getSupportFragmentManager().beginTransaction().replace(R.id.fl_main_a_fragments_holder, new OrderFragment()).commit();
     }
 
     private void addOrderConfirmDialog() {

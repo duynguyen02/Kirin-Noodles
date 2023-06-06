@@ -25,6 +25,7 @@ import bomoncntt.svk62.mssv2051067158.R;
 import bomoncntt.svk62.mssv2051067158.data.local.KirinNoodlesSQLiteHelper;
 import bomoncntt.svk62.mssv2051067158.data.local.repository.KirinNoodlesRepositoryImpl;
 import bomoncntt.svk62.mssv2051067158.data.local.repository.OrderRepositoryImpl;
+import bomoncntt.svk62.mssv2051067158.data.local.repository.factory.LocalRepositoryFactory;
 import bomoncntt.svk62.mssv2051067158.databinding.FragmentOrderBinding;
 import bomoncntt.svk62.mssv2051067158.domain.models.Order;
 import bomoncntt.svk62.mssv2051067158.domain.repository.DishRepository;
@@ -57,7 +58,7 @@ public class OrderFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         fragmentActivity = requireActivity();
-        orderRepository = OrderRepositoryImpl.getInstance(KirinNoodlesSQLiteHelper.getInstance(fragmentActivity));
+        orderRepository = (OrderRepository) LocalRepositoryFactory.getInstance(LocalRepositoryFactory.RepositoryType.ORDER);
     }
 
     @Override
@@ -76,12 +77,14 @@ public class OrderFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        binding.fabOrderFAddOrder.setOnClickListener(v -> requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fl_main_a_fragments_holder, new AddOrderFragment()).commit());
-
+        binding.fabOrderFAddOrder.setOnClickListener(v -> openAddOrderFragment());
         toolbarSetup();
         listviewSetup();
 
+    }
+
+    public void openAddOrderFragment(){
+        requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fl_main_a_fragments_holder, new AddOrderFragment()).commit();
     }
 
     private void listviewSetup() {

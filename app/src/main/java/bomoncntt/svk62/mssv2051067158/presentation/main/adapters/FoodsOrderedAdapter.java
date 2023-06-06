@@ -90,7 +90,7 @@ public class FoodsOrderedAdapter extends BaseAdapter {
         return binding.getRoot();
     }
 
-    public static class FoodOrderDetailDialog extends DialogFragment{
+    public static class FoodOrderDetailDialog extends DialogFragment implements TextWatcher{
         private DialogFoodOrderDetailBinding binding;
         private final Dish dish;
         private final FoodsOrderedAdapter foodsOrderedAdapter;
@@ -108,9 +108,13 @@ public class FoodsOrderedAdapter extends BaseAdapter {
             MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
             builder.setView(binding.getRoot());
 
+            viewsSetup();
 
+            return builder.create();
+        }
+
+        private void viewsSetup() {
             binding.tvFoodOrderDetailDFoodName.setText(dish.getDishName());
-
             if(foodsOrderedAdapter.order.getOrderMap().containsKey(dish)){
                 OrderedDish orderedDish = foodsOrderedAdapter.order.getOrderMap().get(dish);
                 binding.tvFoodOrderDetailDPrice.setText(CurrencyHelper.currencyConverter((long) orderedDish.getQuantity() * dish.getPrice()));
@@ -121,61 +125,58 @@ public class FoodsOrderedAdapter extends BaseAdapter {
                 binding.tvFoodOrderDetailDPrice.setText(CurrencyHelper.currencyConverter(dish.getPrice()));
                 binding.etFoodOrderDetailDQuantity.setText("1");
             }
+            binding.etFoodOrderDetailDQuantity.addTextChangedListener(this);
+            binding.btnFoodOrderDetailDAdd.setOnClickListener(v -> addOrderedDish());
+            binding.btnFoodOrderDetailDRemove.setOnClickListener(v -> removeOrderedDish());
+        }
 
-            binding.etFoodOrderDetailDQuantity.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        private void addOrderedDish() {
+            String quantity = binding.etFoodOrderDetailDQuantity.getText().toString().trim();
+            String note = binding.etFoodOrderDetailDNote.getText().toString();
 
-                }
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    if(s.length()!=0){
-                        binding.tvFoodOrderDetailDPrice.setText(
-                                CurrencyHelper.currencyConverter(
-                                        Long.parseLong(s.toString()) * dish.getPrice()
-                                )
-                        );
-                    }
-                    else {
-                        binding.tvFoodOrderDetailDPrice.setText(
-                                CurrencyHelper.currencyConverter(
-                                        Long.parseLong("1") * dish.getPrice()
-                                )
-                        );
-                        binding.etFoodOrderDetailDQuantity.setText("1");
-                    }
-                }
-                @Override
-                public void afterTextChanged(Editable s) {
-                }
-            });
+            if(quantity.isEmpty()){
+                Toast.makeText(foodsOrderedAdapter.fragmentActivity, "Vui Lòng Nhập Số Lượng", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-            binding.btnFoodOrderDetailDRemove.setOnClickListener(v -> FoodOrderDetailDialog.this.dismiss());
-            binding.btnFoodOrderDetailDAdd.setOnClickListener(v -> {
-                String quantity = binding.etFoodOrderDetailDQuantity.getText().toString();
-                String note = binding.etFoodOrderDetailDNote.getText().toString();
+            foodsOrderedAdapter.order.getOrderMap().put(dish, new OrderedDish(
+                    dish.getDishID(), Integer.parseInt(quantity), note, -1
+            ));
 
-                foodsOrderedAdapter.order.getOrderMap().put(dish, new OrderedDish(
-                        dish.getDishID(), Integer.parseInt(quantity), note, -1
-                ));
+            foodsOrderedAdapter.isChecked.set(foodsOrderedAdapter.dishes.indexOf(dish), true);
+            foodsOrderedAdapter.notifyDataSetChanged();
+            FoodOrderDetailDialog.this.dismiss();
+        }
 
-                foodsOrderedAdapter.isChecked.set(foodsOrderedAdapter.dishes.indexOf(dish), true);
-                foodsOrderedAdapter.notifyDataSetChanged();
-                FoodOrderDetailDialog.this.dismiss();
+        private void removeOrderedDish() {
+            foodsOrderedAdapter.order.getOrderMap().remove(dish);
+            foodsOrderedAdapter.isChecked.set(foodsOrderedAdapter.dishes.indexOf(dish), false);
+            foodsOrderedAdapter.notifyDataSetChanged();
+            FoodOrderDetailDialog.this.dismiss();
+        }
 
-            });
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+        }
 
-            binding.btnFoodOrderDetailDRemove.setOnClickListener(v -> {
-                foodsOrderedAdapter.order.getOrderMap().remove(dish);
-                foodsOrderedAdapter.isChecked.set(foodsOrderedAdapter.dishes.indexOf(dish), false);
-                foodsOrderedAdapter.notifyDataSetChanged();
-                FoodOrderDetailDialog.this.dismiss();
-            });
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            if(s.length()!=0){
+                binding.tvFoodOrderDetailDPrice.setText(
+                        CurrencyHelper.currencyConverter(
+                                Long.parseLong(s.toString()) * dish.getPrice()
+                        )
+                );
+            }
+            else {
+                binding.tvFoodOrderDetailDPrice.setText("0");
+            }
+        }
 
+        @Override
+        public void afterTextChanged(Editable s) {
 
-
-            return builder.create();
         }
     }
 

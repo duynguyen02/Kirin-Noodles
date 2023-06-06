@@ -7,7 +7,7 @@ import bomoncntt.svk62.mssv2051067158.domain.models.Invoice;
 import bomoncntt.svk62.mssv2051067158.domain.models.OrderedDish;
 import bomoncntt.svk62.mssv2051067158.domain.models.TableLocation;
 
-public interface KirinNoodlesRepository{
+public interface KirinNoodlesRepository extends Repository{
     boolean addDish(Dish dish);
     Dish getDishByID(int dishID);
     List<Dish> getAllDishes();

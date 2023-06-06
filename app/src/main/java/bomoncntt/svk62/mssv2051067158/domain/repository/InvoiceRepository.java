@@ -5,7 +5,7 @@ import java.util.List;
 import bomoncntt.svk62.mssv2051067158.domain.models.Invoice;
 import bomoncntt.svk62.mssv2051067158.domain.models.TableLocation;
 
-public interface InvoiceRepository {
+public interface InvoiceRepository extends Repository{
     boolean addInvoice(Invoice invoice);
 
     Invoice getInvoiceByID(int invoiceID);

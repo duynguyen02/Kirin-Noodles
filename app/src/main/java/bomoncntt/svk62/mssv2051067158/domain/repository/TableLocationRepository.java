@@ -4,7 +4,7 @@ import java.util.List;
 
 import bomoncntt.svk62.mssv2051067158.domain.models.TableLocation;
 
-public interface TableLocationRepository {
+public interface TableLocationRepository extends Repository{
     boolean addTableLocation(TableLocation tableLocation);
     TableLocation getTableLocationByID(int tableLocationID);
     List<TableLocation> getAllTableLocations();

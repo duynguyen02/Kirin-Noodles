@@ -59,18 +59,32 @@ public class  LoginActivity extends AppCompatActivity {
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        kirinNoodlesBackupRepository = KirinNoodlesBackupRepositoryImpl.getInstance();
-        kirinNoodlesRepository = KirinNoodlesRepositoryImpl.getInstance(this);
-        dataRecoveryHelper = DataRecoveryHelper.getInstance(this);
+        initComponents();
 
+    }
+
+
+    private void initComponents(){
+        getDependenciesInstance();
+        setInitialPassword();
+        viewSetup();
+    }
+
+    private void viewSetup() {
+        binding.btnLoginALogin.setOnClickListener(v -> login());
+        binding.tvLoginAGetBackup.setOnClickListener(v -> dataRecoveryConfirm());
+    }
+
+    private void setInitialPassword(){
         if(SecurePasswordManager.getPassword()==null){
             new RequirePasswordDialogFragment().show(getSupportFragmentManager(), "RequirePasswordDialogFragment");
         }
+    }
 
-        binding.btnLoginALogin.setOnClickListener(v -> login());
-
-        binding.tvLoginAGetBackup.setOnClickListener(v -> dataRecoveryConfirm());
-
+    private void getDependenciesInstance(){
+        kirinNoodlesBackupRepository = KirinNoodlesBackupRepositoryImpl.getInstance();
+        kirinNoodlesRepository = KirinNoodlesRepositoryImpl.getInstance(this);
+        dataRecoveryHelper = DataRecoveryHelper.getInstance(this);
     }
 
     private void dataRecoveryConfirm() {
@@ -82,11 +96,8 @@ public class  LoginActivity extends AppCompatActivity {
     }
 
     private void openDataRecoveryDialog() {
-
         new DataRecoveryDialogFragment(value -> {
-
             binding.flLoginALoading.setVisibility(View.VISIBLE);
-
             Call<Record> backupResultCall = kirinNoodlesBackupRepository.getBackUp(value);
             backupResultCall.enqueue(new Callback<Record>() {
                 @Override
@@ -100,7 +111,6 @@ public class  LoginActivity extends AppCompatActivity {
                         Toast.makeText(LoginActivity.this,"Có lỗi xảy ra!", Toast.LENGTH_SHORT).show();
                     }
                 }
-
                 @Override
                 public void onFailure(@NonNull Call<Record> call, @NonNull Throwable t) {
                     binding.flLoginALoading.setVisibility(View.GONE);
@@ -112,27 +122,13 @@ public class  LoginActivity extends AppCompatActivity {
     }
 
     private void recoveryData(Record record) {
-        dataRecoveryHelper.resetData();
-        SecurePasswordManager.setLoginWithPassword(true);
-        SecurePasswordManager.savePassword(record.getKirinNoodlesBackup().getPassword());
-
-        List<Dish> dishes = record.getKirinNoodlesBackup().getDishDtos().stream().map(dishDto -> dishDto.mapFromDto(LoginActivity.this)).collect(Collectors.toList());
-        List<TableLocation> tableLocations = record.getKirinNoodlesBackup().getTableLocationDtos().stream().map(TableLocationDto::mapFromDto).collect(Collectors.toList());
-        List<Invoice> invoices = record.getKirinNoodlesBackup().getInvoiceDtos().stream().map(InvoiceDto::mapFromDto).collect(Collectors.toList());
-        List<OrderedDish> orderedDishes = record.getKirinNoodlesBackup().getOrderedDishDtos().stream().map(OrderedDishDto::mapFromDto).collect(Collectors.toList());
-
-        dishes.forEach(dish -> kirinNoodlesRepository.addDish(dish));
-        tableLocations.forEach(tableLocation -> kirinNoodlesRepository.addTableLocation(tableLocation));
-        invoices.forEach(invoice -> kirinNoodlesRepository.addInvoice(invoice));
-        orderedDishes.forEach(orderedDish -> kirinNoodlesRepository.addOrderedDish(orderedDish));
-
+        dataRecoveryHelper.recoveryData(record);
         Toast.makeText(LoginActivity.this,"Khôi phục thành công!", Toast.LENGTH_SHORT).show();
 
     }
 
     private void login() {
         String password = binding.etLoginAPassword.getText().toString();
-
         if(password.equals(SecurePasswordManager.getPassword())){
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);

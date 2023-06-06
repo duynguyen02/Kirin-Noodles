@@ -44,4 +44,5 @@
     <string name="recovery">Khôi Phục</string>
     <string name="backup_data">Sao Lưu Dữ Liệu</string>
     <string name="loading">Đang Tải...</string>
+    <string name="delete_cache">Xóa Bộ Nhớ Đệm</string>
 </resources>

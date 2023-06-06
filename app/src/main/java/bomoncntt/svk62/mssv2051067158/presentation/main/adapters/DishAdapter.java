@@ -9,13 +9,16 @@ import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.collection.ArraySet;
 import androidx.fragment.app.FragmentManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import bomoncntt.svk62.mssv2051067158.data.local.repository.factory.LocalRepositoryFactory;
 import bomoncntt.svk62.mssv2051067158.databinding.ListviewItemFoodBinding;
 import bomoncntt.svk62.mssv2051067158.domain.models.Dish;
 import bomoncntt.svk62.mssv2051067158.domain.repository.DishRepository;
@@ -25,15 +28,13 @@ import bomoncntt.svk62.mssv2051067158.utils.OnItemChangedListener;
 import bomoncntt.svk62.mssv2051067158.utils.ViewHelper;
 
 public class DishAdapter extends ArrayAdapter<Dish> {
-    private final Map<String, Dish> checkedItems = new HashMap<>();
+    private final Set<Dish> checkedItems = new ArraySet<>();
     private ListviewItemFoodBinding binding;
     private FragmentManager fragmentManager;
-    private DishRepository dishRepository;
 
-    public DishAdapter(@NonNull Context context, List<Dish> dishes, FragmentManager fragmentManager, DishRepository dishRepository) {
+    public DishAdapter(@NonNull Context context, List<Dish> dishes, FragmentManager fragmentManager) {
         super(context, 0, dishes);
         this.fragmentManager = fragmentManager;
-        this.dishRepository = dishRepository;
     }
 
     @SuppressLint({"ViewHolder", "SetTextI18n"})
@@ -51,10 +52,10 @@ public class DishAdapter extends ArrayAdapter<Dish> {
 
         binding.cbFoodLviChecked.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if(isChecked){
-                checkedItems.put(Integer.toString(position), getItem(position));
+                checkedItems.add(_dish);
             }
             else {
-                checkedItems.remove(Integer.toString(position));
+                checkedItems.remove(_dish);
             }
         });
 
@@ -77,7 +78,7 @@ public class DishAdapter extends ArrayAdapter<Dish> {
     }
 
     public List<Dish> getChecked(){
-        return new ArrayList<>(checkedItems.values());
+        return new ArrayList<>(checkedItems);
     }
 
 }

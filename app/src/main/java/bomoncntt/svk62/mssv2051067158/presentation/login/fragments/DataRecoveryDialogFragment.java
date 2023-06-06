@@ -60,20 +60,20 @@ public class DataRecoveryDialogFragment extends DialogFragment {
         binding = DialogDataRecoveryBinding.inflate(inflater);
         builder.setView(binding.getRoot());
 
-        binding.btnDataRecoverySubmit.setOnClickListener(v -> {
-            String id = binding.etDataRecoveryDId.getText().toString().trim();
-            if(id.isEmpty()){
-                Toast.makeText(fragmentActivity, "Vui lòng nhập mã sao lưu!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            DataRecoveryDialogFragment.this.dismiss();
-            onResultListener.OnResult(id);
-
-        });
-
+        binding.btnDataRecoverySubmit.setOnClickListener(v -> getRecoveryCode());
 
         return builder.create();
+    }
+
+    private void getRecoveryCode() {
+        String id = binding.etDataRecoveryDId.getText().toString().trim();
+        if(id.isEmpty()){
+            Toast.makeText(fragmentActivity, "Vui lòng nhập mã sao lưu!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        DataRecoveryDialogFragment.this.dismiss();
+        onResultListener.OnResult(id);
     }
 
 

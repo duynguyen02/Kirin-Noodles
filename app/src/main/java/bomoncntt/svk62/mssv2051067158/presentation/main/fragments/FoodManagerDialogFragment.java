@@ -32,6 +32,7 @@ import java.io.IOException;
 import bomoncntt.svk62.mssv2051067158.R;
 import bomoncntt.svk62.mssv2051067158.data.local.KirinNoodlesSQLiteHelper;
 import bomoncntt.svk62.mssv2051067158.data.local.repository.DishRepositoryImpl;
+import bomoncntt.svk62.mssv2051067158.data.local.repository.factory.LocalRepositoryFactory;
 import bomoncntt.svk62.mssv2051067158.databinding.DialogAddFoodBinding;
 import bomoncntt.svk62.mssv2051067158.domain.models.Dish;
 import bomoncntt.svk62.mssv2051067158.domain.repository.DishRepository;
@@ -66,7 +67,7 @@ public class FoodManagerDialogFragment extends DialogFragment {
         super.onAttach(context);
         fragmentActivity = requireActivity();
         fileIOHelper = FileIOHelper.getInstance(fragmentActivity);
-        dishRepository = DishRepositoryImpl.getInstance(KirinNoodlesSQLiteHelper.getInstance(fragmentActivity));
+        dishRepository = (DishRepository) LocalRepositoryFactory.getInstance(LocalRepositoryFactory.RepositoryType.DISH);
 
     }
 
@@ -104,24 +105,25 @@ public class FoodManagerDialogFragment extends DialogFragment {
 
         binding.etAddFoodDFoodPrice.addTextChangedListener(new CurrencyTextWatcher(binding.etAddFoodDFoodPrice));
 
-        binding.btnAddFoodDAdd.setOnClickListener(v -> {
-            Dish dish = getDishFromUserInput();
-            if(dish == null){
-                Toast.makeText(fragmentActivity, "Vui lòng nhập đầy đủ!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (this.dish == null){
-                addDishToDatabase(dish);
-            }
-            else {
-                updateDish(this.dish, dish);
-            }
-
-        });
+        binding.btnAddFoodDAdd.setOnClickListener(v -> saveFood());
 
         binding.ivAddFoodDFoodImage.setOnClickListener(v -> showImageSelectionDialog());
 
+    }
+
+    private void saveFood() {
+        Dish dish = getDishFromUserInput();
+        if(dish == null){
+            Toast.makeText(fragmentActivity, "Vui lòng nhập đầy đủ!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (this.dish == null){
+            addDishToDatabase(dish);
+        }
+        else {
+            updateDish(this.dish, dish);
+        }
     }
 
     private void updateDish(Dish oldDish, Dish newDish) {

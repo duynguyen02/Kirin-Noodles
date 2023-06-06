@@ -4,7 +4,7 @@ import java.util.List;
 
 import bomoncntt.svk62.mssv2051067158.domain.models.Dish;
 
-public interface DishRepository {
+public interface DishRepository extends Repository{
     boolean addDish(Dish dish);
     Dish getDishByID(int dishID);
     List<Dish> getAllDishes();

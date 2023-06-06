@@ -16,6 +16,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import bomoncntt.svk62.mssv2051067158.R;
 import bomoncntt.svk62.mssv2051067158.data.local.KirinNoodlesSQLiteHelper;
 import bomoncntt.svk62.mssv2051067158.data.local.repository.TableLocationRepositoryImpl;
+import bomoncntt.svk62.mssv2051067158.data.local.repository.factory.LocalRepositoryFactory;
 import bomoncntt.svk62.mssv2051067158.databinding.DialogAddTableBinding;
 import bomoncntt.svk62.mssv2051067158.domain.models.TableLocation;
 import bomoncntt.svk62.mssv2051067158.domain.repository.TableLocationRepository;
@@ -37,7 +38,7 @@ public class TableManagerDialogFragment extends DialogFragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         fragmentActivity = requireActivity();
-        tableLocationRepository = TableLocationRepositoryImpl.getInstance(KirinNoodlesSQLiteHelper.getInstance(fragmentActivity));
+        tableLocationRepository = (TableLocationRepository) LocalRepositoryFactory.getInstance(LocalRepositoryFactory.RepositoryType.TABLE_LOCATION);
     }
 
     @NonNull
@@ -49,25 +50,25 @@ public class TableManagerDialogFragment extends DialogFragment {
         builder.setView(binding.getRoot());
 
         viewsSetup();
-
-        binding.btnAddTableDAdd.setOnClickListener(v -> {
-            String tableName = binding.etAddTableDTableName.getText().toString().trim();
-
-            if(tableName.equals("")){
-                Toast.makeText(requireActivity(), "Vui lòng nhập đầy đủ!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (tableLocation == null){
-                addTableLocationToDatabase(tableName);
-            }
-            else {
-                updateTableLocation(tableName);
-            }
-
-        });
+        binding.btnAddTableDAdd.setOnClickListener(v -> saveTable());
 
         return builder.create();
+    }
+
+    private void saveTable() {
+        String tableName = binding.etAddTableDTableName.getText().toString().trim();
+
+        if(tableName.equals("")){
+            Toast.makeText(requireActivity(), "Vui lòng nhập đầy đủ!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (tableLocation == null){
+            addTableLocationToDatabase(tableName);
+        }
+        else {
+            updateTableLocation(tableName);
+        }
     }
 
     private void updateTableLocation(String tableName) {

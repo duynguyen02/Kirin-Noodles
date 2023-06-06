@@ -16,9 +16,7 @@ import bomoncntt.svk62.mssv2051067158.data.local.SecurePasswordManager;
 import bomoncntt.svk62.mssv2051067158.databinding.DialogRequirePasswordBinding;
 
 public class RequirePasswordDialogFragment extends DialogFragment {
-
     private DialogRequirePasswordBinding binding;
-
 
     @NonNull
     @Override
@@ -28,23 +26,24 @@ public class RequirePasswordDialogFragment extends DialogFragment {
         binding = DialogRequirePasswordBinding.inflate(inflater);
         builder.setView(binding.getRoot());
 
+        binding.btnRequirePasswordDConfirm.setOnClickListener(v -> confirmPassword());
+
         setCancelable(false);
 
-        binding.btnRequirePasswordDConfirm.setOnClickListener(v -> {
-            String password = binding.etRequirePasswordDPassword.getText().toString();
-            String passwordAgain = binding.etRequirePasswordDPasswordAgain.getText().toString();
-
-            if(password.isEmpty() || passwordAgain.isEmpty() || !passwordAgain.equals(password)){
-                Toast.makeText(requireActivity(), "Vui lòng nhập mật khẩu trùng khớp", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            SecurePasswordManager.savePassword(password);
-            Toast.makeText(requireActivity(), "Thiết lập thành công! Vui lòng đăng nhập để tiếp tục.", Toast.LENGTH_SHORT).show();
-            RequirePasswordDialogFragment.this.dismiss();
-        });
-
-
         return builder.create();
+    }
+
+    private void confirmPassword() {
+        String password = binding.etRequirePasswordDPassword.getText().toString();
+        String passwordAgain = binding.etRequirePasswordDPasswordAgain.getText().toString();
+
+        if(password.isEmpty() || passwordAgain.isEmpty() || !passwordAgain.equals(password)){
+            Toast.makeText(requireActivity(), "Vui lòng nhập mật khẩu trùng khớp", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        SecurePasswordManager.savePassword(password);
+        Toast.makeText(requireActivity(), "Thiết lập thành công! Vui lòng đăng nhập để tiếp tục.", Toast.LENGTH_SHORT).show();
+        RequirePasswordDialogFragment.this.dismiss();
     }
 }

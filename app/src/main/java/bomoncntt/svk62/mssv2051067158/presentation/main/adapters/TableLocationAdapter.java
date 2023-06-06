@@ -9,13 +9,16 @@ import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.collection.ArraySet;
 import androidx.fragment.app.FragmentManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import bomoncntt.svk62.mssv2051067158.data.local.repository.factory.LocalRepositoryFactory;
 import bomoncntt.svk62.mssv2051067158.databinding.ListviewItemTableLocationBinding;
 import bomoncntt.svk62.mssv2051067158.domain.models.TableLocation;
 import bomoncntt.svk62.mssv2051067158.domain.repository.TableLocationRepository;
@@ -24,15 +27,15 @@ import bomoncntt.svk62.mssv2051067158.utils.OnItemChangedListener;
 
 public class TableLocationAdapter extends ArrayAdapter<TableLocation> {
 
-    private final Map<String, TableLocation> checkedItems = new HashMap<>();
+    private final Set<TableLocation> checkedItems = new ArraySet<>();
     private ListviewItemTableLocationBinding binding;
     private TableLocationRepository tableLocationRepository;
     private FragmentManager fragmentManager;
 
 
-    public TableLocationAdapter(@NonNull Context context, List<TableLocation> tableLocations, TableLocationRepository tableLocationRepository, FragmentManager fragmentManager) {
+    public TableLocationAdapter(@NonNull Context context, List<TableLocation> tableLocations, FragmentManager fragmentManager) {
         super(context, 0, tableLocations);
-        this.tableLocationRepository = tableLocationRepository;
+        this.tableLocationRepository = (TableLocationRepository) LocalRepositoryFactory.getInstance(LocalRepositoryFactory.RepositoryType.TABLE_LOCATION);
         this.fragmentManager = fragmentManager;
     }
 
@@ -48,10 +51,10 @@ public class TableLocationAdapter extends ArrayAdapter<TableLocation> {
 
         binding.cbTableLocationLviSelected.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if(isChecked){
-                checkedItems.put(Integer.toString(position), getItem(position));
+                checkedItems.add(_tableLocation);
             }
             else {
-                checkedItems.remove(Integer.toString(position));
+                checkedItems.remove(_tableLocation);
             }
         });
 
@@ -72,7 +75,7 @@ public class TableLocationAdapter extends ArrayAdapter<TableLocation> {
     }
 
     public List<TableLocation> getChecked(){
-        return new ArrayList<>(checkedItems.values());
+        return new ArrayList<>(checkedItems);
     }
 
 }

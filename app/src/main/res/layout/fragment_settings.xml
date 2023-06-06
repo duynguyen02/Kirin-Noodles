@@ -16,7 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.2" />
+        app:layout_constraintVertical_bias="0.1" />
 
     <TextView
         android:id="@+id/tv_settings_f_app_name"
@@ -78,6 +78,17 @@
         app:layout_constraintTop_toBottomOf="@+id/btn_settings_f_reset_data"
         tools:layout_editor_absoluteX="18dp" />
 
+    <Button
+        android:id="@+id/btn_settings_f_delete_cache"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/border_black_corner"
+        android:text="@string/delete_cache"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toBottomOf="@+id/btn_settings_f_backup"
+        tools:layout_editor_absoluteX="18dp" />
+
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/swt_settings_f_require_password"
         android:layout_width="match_parent"
@@ -86,7 +97,7 @@
         android:text="@string/require_password_when_opening_app"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_settings_f_backup" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_settings_f_delete_cache" />
 
     <TextView
         android:id="@+id/btn_settings_f_logout"

@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CompoundButton;
+import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.FragmentActivity;
@@ -22,10 +23,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import bomoncntt.svk62.mssv2051067158.R;
 import bomoncntt.svk62.mssv2051067158.data.local.KirinNoodlesSQLiteHelper;
 import bomoncntt.svk62.mssv2051067158.data.local.repository.InvoiceRepositoryImpl;
+import bomoncntt.svk62.mssv2051067158.data.local.repository.factory.LocalRepositoryFactory;
 import bomoncntt.svk62.mssv2051067158.databinding.ListviewItemOrderBinding;
 import bomoncntt.svk62.mssv2051067158.domain.models.Dish;
 import bomoncntt.svk62.mssv2051067158.domain.models.Invoice;
@@ -36,6 +40,7 @@ import bomoncntt.svk62.mssv2051067158.domain.repository.InvoiceRepository;
 import bomoncntt.svk62.mssv2051067158.utils.BillGenerator;
 import bomoncntt.svk62.mssv2051067158.utils.CurrencyHelper;
 import bomoncntt.svk62.mssv2051067158.utils.DateHelper;
+import bomoncntt.svk62.mssv2051067158.utils.ViewHelper;
 
 public class OrderAdapter extends BaseAdapter {
     private ListviewItemOrderBinding binding;
@@ -48,11 +53,11 @@ public class OrderAdapter extends BaseAdapter {
     public OrderAdapter(FragmentActivity fragmentActivity, List<Order> orderList, View loadingView) {
         this.orderList = orderList;
         this.fragmentActivity = fragmentActivity;
-        this.invoiceRepository = InvoiceRepositoryImpl.getInstance(KirinNoodlesSQLiteHelper.getInstance(fragmentActivity));
+        this.invoiceRepository = (InvoiceRepository) LocalRepositoryFactory.getInstance(LocalRepositoryFactory.RepositoryType.INVOICE);
         this.loadingView = loadingView;
     }
 
-    public List<Order> getCheckedOrders(){
+    public List<Order> getCheckedOrders() {
         return new ArrayList<>(checkedOrders);
     }
 
@@ -82,35 +87,33 @@ public class OrderAdapter extends BaseAdapter {
         binding.tvOrderLviInvoiceId.setText(String.valueOf(_invoice.getInvoiceID()));
         binding.tvOrderLviCreatedDate.setText(DateHelper.dataToStringConverter(_invoice.getOrderTime()));
 
-        if(_tableLocation == null){
+        if (_tableLocation == null) {
             binding.tvOrderLviTableLocation.setText("-");
-        }
-        else {
+        } else {
             binding.tvOrderLviTableLocation.setText(_tableLocation.getTableName());
         }
 
         binding.tvOrderLviPrice.setText(CurrencyHelper.currencyConverter(_invoice.getTotal()));
 
-        switch (_invoice.getPaymentStatus()){
-            case PREPARING:{
+        switch (_invoice.getPaymentStatus()) {
+            case PREPARING: {
                 binding.ivOrderLviPaymentStatus.setImageResource(R.drawable.hot_pot);
                 break;
             }
-            case WAITING_FOR_PAYMENT:{
+            case WAITING_FOR_PAYMENT: {
                 binding.ivOrderLviPaymentStatus.setImageResource(R.drawable.time);
                 break;
             }
-            case PAID:{
+            case PAID: {
                 binding.ivOrderLviPaymentStatus.setImageResource(R.drawable.money);
                 break;
             }
         }
 
         binding.cbOrderLviChecked.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if(isChecked){
+            if (isChecked) {
                 checkedOrders.add(_order);
-            }
-            else {
+            } else {
                 checkedOrders.remove(_order);
             }
         });
@@ -143,36 +146,33 @@ public class OrderAdapter extends BaseAdapter {
     }
 
     private void shareBill(Order order) {
-        loadingView.setVisibility(View.VISIBLE);
-        CompletableFuture<File> completableFuture = CompletableFuture.supplyAsync(() -> BillGenerator.createBill(order, fragmentActivity));
+        CompletableFuture<File> completableFuture = CompletableFuture.supplyAsync(() -> {
+            ViewHelper.setVisibilityViewOnUiThread(fragmentActivity, loadingView, View.VISIBLE);
+            return BillGenerator.createBill(order, fragmentActivity);
+        });
 
-        completableFuture.thenAccept((File filePath) -> {
+        completableFuture.thenAccept((File file) -> {
             String authority = fragmentActivity.getPackageName() + ".provider";
-            assert filePath != null;
-            Uri uri = FileProvider.getUriForFile(fragmentActivity, authority, filePath);
+            Uri uri = FileProvider.getUriForFile(fragmentActivity, authority, file);
 
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("application/pdf");
             shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
             shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             fragmentActivity.startActivity(Intent.createChooser(shareIntent, "Share PDF"));
-            loadingView.setVisibility(View.GONE);
+            ViewHelper.setVisibilityViewOnUiThread(fragmentActivity, loadingView, View.GONE);
         });
-
-
     }
 
     private void changePaymentStatus(Order _order) {
         Invoice invoice = _order.getInvoice();
 
         Invoice.PaymentStatus paymentStatus;
-        if(invoice.getPaymentStatus() == Invoice.PaymentStatus.PREPARING){
+        if (invoice.getPaymentStatus() == Invoice.PaymentStatus.PREPARING) {
             paymentStatus = Invoice.PaymentStatus.WAITING_FOR_PAYMENT;
-        }
-        else if (invoice.getPaymentStatus() == Invoice.PaymentStatus.WAITING_FOR_PAYMENT){
+        } else if (invoice.getPaymentStatus() == Invoice.PaymentStatus.WAITING_FOR_PAYMENT) {
             paymentStatus = Invoice.PaymentStatus.PAID;
-        }
-        else {
+        } else {
             paymentStatus = Invoice.PaymentStatus.PREPARING;
         }
         invoice.setPaymentStatus(paymentStatus);
@@ -181,7 +181,7 @@ public class OrderAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    private void showInvoiceDetail(Order order){
+    private void showInvoiceDetail(Order order) {
         Invoice invoice = order.getInvoice();
 
         StringBuilder foodStringBuilder = new StringBuilder();
@@ -195,24 +195,24 @@ public class OrderAdapter extends BaseAdapter {
                     .append(orderedDish.getQuantity())
                     .append("\n")
                     .append("Giá: ")
-                    .append(CurrencyHelper.currencyConverter((double)orderedDish.getQuantity() * dish.getPrice()))
+                    .append(CurrencyHelper.currencyConverter((double) orderedDish.getQuantity() * dish.getPrice()))
                     .append("\n")
                     .append("Ghi chú: ")
                     .append(orderedDish.getNote())
-                    .append("\n\n");
+                    .append("\n-------------------\n");
         }
 
         String paymentStatus = "";
-        switch (invoice.getPaymentStatus()){
-            case PREPARING:{
+        switch (invoice.getPaymentStatus()) {
+            case PREPARING: {
                 paymentStatus = "Đang chuẩn bị...";
                 break;
             }
-            case WAITING_FOR_PAYMENT:{
+            case WAITING_FOR_PAYMENT: {
                 paymentStatus = "Đang chờ thanh toán...";
                 break;
             }
-            case PAID:{
+            case PAID: {
                 paymentStatus = "Đã thanh toán!";
                 break;
             }
@@ -227,8 +227,7 @@ public class OrderAdapter extends BaseAdapter {
                 "Trạng thái: " + paymentStatus +
                 "\n\n" +
                 foodStringBuilder + "Tổng: " + CurrencyHelper.currencyConverter(invoice.getTotal()) + "\n" +
-                "Giá tổng hóa đơn có thể khác giá sản phẩm do giá sản phẩm đã thay đổi sau khi đã lên đơn."
-                ;
+                "Giá tổng hóa đơn có thể khác giá sản phẩm do giá sản phẩm đã thay đổi sau khi đã lên đơn.";
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(fragmentActivity);
         builder.setTitle("Chi Tiết Hóa Đơn")

@@ -8,6 +8,8 @@ import android.util.Base64;
 import android.view.View;
 import android.widget.ImageView;
 
+import androidx.fragment.app.FragmentActivity;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,7 +44,7 @@ public class ViewHelper {
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 Path path = Paths.get(imagePath);
-                byte[] imageBytes = new byte[0];
+                byte[] imageBytes;
                 imageBytes = Files.readAllBytes(path);
                 byte[] encodedBytes = Base64.encode(imageBytes, Base64.DEFAULT);
                 return new String(encodedBytes);
@@ -64,6 +66,11 @@ public class ViewHelper {
         else {
             imageView.setImageResource(R.drawable.food_example);
         }
+    }
+
+    public static void setVisibilityViewOnUiThread(FragmentActivity activity, View view, int visibility){
+        System.out.println("run");
+        activity.runOnUiThread(() -> view.setVisibility(visibility));
     }
 
 
