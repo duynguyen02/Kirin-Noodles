@@ -92,7 +92,7 @@ public class BillGenerator {
             table.setSpacingBefore(20f);
             table.setSpacingAfter(20f);
 
-            addTableHeader(table, tableHeaderFont,"Tên Món", "SL", "Đơn Giá", "Ghi Chú");
+            addTableHeader(table, tableHeaderFont,"Tên Món", "SL", "Giá/Món", "Ghi Chú");
 
             for(Dish dish : order.getOrderMap().keySet()){
                 OrderedDish orderedDish = order.getOrderMap().get(dish);

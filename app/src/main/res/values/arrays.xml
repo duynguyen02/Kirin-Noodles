@@ -7,6 +7,6 @@
     <string-array name="invoice_options">
         <item>Chi Tiết Đơn Hàng</item>
         <item>Chuyển Đổi Trạng Thái Đơn Hàng</item>
-        <item>Gửi Đơn</item>
+        <item>Xuất Đơn</item>
     </string-array>
 </resources>

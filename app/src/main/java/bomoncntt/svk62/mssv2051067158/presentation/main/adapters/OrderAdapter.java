@@ -57,6 +57,11 @@ public class OrderAdapter extends BaseAdapter {
         this.loadingView = loadingView;
     }
 
+    public void deleteOrder(Order order){
+        orderList.remove(order);
+        notifyDataSetChanged();
+    }
+
     public List<Order> getCheckedOrders() {
         return new ArrayList<>(checkedOrders);
     }

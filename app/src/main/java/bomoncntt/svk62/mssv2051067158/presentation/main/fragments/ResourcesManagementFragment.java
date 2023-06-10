@@ -202,17 +202,22 @@ public class ResourcesManagementFragment extends Fragment {
             }
             if (wasSuccessful) {
                 fileIOHelper.deleteFile(dish.getImageLocation());
+                dishAdapter.remove(dish);
+                dishAdapter.notifyDataSetChanged();
             }
-            foodsListviewSetup();
         }
     }
 
     private void deleteTableLocations(List<TableLocation> finalTableLocations) {
         for (TableLocation tableLocation : finalTableLocations) {
+            boolean wasSuccessful = false;
             if (!invoiceRepository.isTableLocationExist(tableLocation)) {
-                tableLocationRepository.deleteTableLocation(tableLocation.getTableID());
+                wasSuccessful = tableLocationRepository.deleteTableLocation(tableLocation.getTableID());
             }
-            tableLocationSetup();
+            if(wasSuccessful){
+                tableLocationAdapter.remove(tableLocation);
+                tableLocationAdapter.notifyDataSetChanged();
+            }
         }
     }
 
@@ -224,7 +229,8 @@ public class ResourcesManagementFragment extends Fragment {
             new FoodManagerDialogFragment(new OnItemChangedListener<Dish>() {
                 @Override
                 public void onItemAdded(Dish newDish) {
-                    foodsListviewSetup();
+                    dishAdapter.add(newDish);
+                    dishAdapter.notifyDataSetChanged();
                 }
 
                 @Override
@@ -238,7 +244,8 @@ public class ResourcesManagementFragment extends Fragment {
             new TableManagerDialogFragment(new OnItemChangedListener<TableLocation>() {
                 @Override
                 public void onItemAdded(TableLocation tableLocation) {
-                    tableLocationSetup();
+                    tableLocationAdapter.add(tableLocation);
+                    tableLocationAdapter.notifyDataSetChanged();
                 }
 
                 @Override

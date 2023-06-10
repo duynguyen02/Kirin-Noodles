@@ -131,7 +131,9 @@ public class OrderFragment extends Fragment {
 
     private void deleteOrders(List<Order> orders) {
         for (Order order : orders){
-            orderRepository.deleteOrder(order);
+            if(orderRepository.deleteOrder(order)){
+                orderAdapter.deleteOrder(order);
+            }
         }
     }
 
