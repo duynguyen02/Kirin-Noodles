@@ -48,13 +48,11 @@ import bomoncntt.svk62.mssv2051067158.utils.DateHelper;
 
 public class AddOrderFragment  extends Fragment {
     private FragmentAddOrderBinding binding;
-
     private TableLocationRepository tableLocationRepository;
     private DishRepository dishRepository;
     private InvoiceRepository invoiceRepository;
     private OrderRepository orderRepository;
     private FoodsOrderedAdapter foodsOrderedAdapter;
-
     private ArrayAdapter<CharSequence> tableLocationsAdapter;
     private List<TableLocation> tableLocations;
     private List<Dish> dishes;
@@ -228,7 +226,7 @@ public class AddOrderFragment  extends Fragment {
 
     private void listviewSetup() {
         dishes = dishRepository.getAllDishes();
-        foodsOrderedAdapter = new FoodsOrderedAdapter(requireActivity(), order, dishes);
+        foodsOrderedAdapter = new FoodsOrderedAdapter(fragmentActivity, order, dishes);
         binding.lvAddOrderFFoods.setAdapter(foodsOrderedAdapter);
     }
 

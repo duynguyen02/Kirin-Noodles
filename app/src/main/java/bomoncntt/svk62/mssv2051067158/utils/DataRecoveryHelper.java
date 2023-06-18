@@ -23,8 +23,8 @@ import bomoncntt.svk62.mssv2051067158.presentation.login.LoginActivity;
 
 public class DataRecoveryHelper {
     private static DataRecoveryHelper instance;
-    private KirinNoodlesSQLiteHelper kirinNoodlesSQLiteHelper;
-    private KirinNoodlesRepository kirinNoodlesRepository;
+    private final KirinNoodlesSQLiteHelper kirinNoodlesSQLiteHelper;
+    private final KirinNoodlesRepository kirinNoodlesRepository;
 
     public synchronized static DataRecoveryHelper getInstance(Context context){
         if(instance == null){
@@ -54,10 +54,10 @@ public class DataRecoveryHelper {
         List<Invoice> invoices = record.getKirinNoodlesBackup().getInvoiceDtos().stream().map(InvoiceDto::mapFromDto).collect(Collectors.toList());
         List<OrderedDish> orderedDishes = record.getKirinNoodlesBackup().getOrderedDishDtos().stream().map(OrderedDishDto::mapFromDto).collect(Collectors.toList());
 
-        dishes.forEach(dish -> kirinNoodlesRepository.addDish(dish));
-        tableLocations.forEach(tableLocation -> kirinNoodlesRepository.addTableLocation(tableLocation));
-        invoices.forEach(invoice -> kirinNoodlesRepository.addInvoice(invoice));
-        orderedDishes.forEach(orderedDish -> kirinNoodlesRepository.addOrderedDish(orderedDish));
+        dishes.forEach(kirinNoodlesRepository::addDish);
+        tableLocations.forEach(kirinNoodlesRepository::addTableLocation);
+        invoices.forEach(kirinNoodlesRepository::addInvoice);
+        orderedDishes.forEach(kirinNoodlesRepository::addOrderedDish);
     }
 
     public KirinNoodlesBackup getBackup(){
