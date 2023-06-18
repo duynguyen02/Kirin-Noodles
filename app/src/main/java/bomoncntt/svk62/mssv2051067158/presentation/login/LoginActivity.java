@@ -122,7 +122,7 @@ public class  LoginActivity extends AppCompatActivity {
     }
 
     private void recoveryData(Record record) {
-        dataRecoveryHelper.recoveryData(record);
+        dataRecoveryHelper.recoveryData(record, this);
         Toast.makeText(LoginActivity.this,"Khôi phục thành công!", Toast.LENGTH_SHORT).show();
 
     }

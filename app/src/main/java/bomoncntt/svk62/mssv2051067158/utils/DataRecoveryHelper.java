@@ -25,7 +25,6 @@ public class DataRecoveryHelper {
     private static DataRecoveryHelper instance;
     private KirinNoodlesSQLiteHelper kirinNoodlesSQLiteHelper;
     private KirinNoodlesRepository kirinNoodlesRepository;
-    private Context context;
 
     public synchronized static DataRecoveryHelper getInstance(Context context){
         if(instance == null){
@@ -37,7 +36,6 @@ public class DataRecoveryHelper {
     private DataRecoveryHelper(Context context){
         this.kirinNoodlesSQLiteHelper = KirinNoodlesSQLiteHelper.getInstance(context.getApplicationContext());
         this.kirinNoodlesRepository = KirinNoodlesRepositoryImpl.getInstance(context);
-        this.context = context;
     }
 
     public void resetData(){
@@ -46,12 +44,12 @@ public class DataRecoveryHelper {
         SecurePasswordManager.setLoginWithPassword(false);
     }
 
-    public void recoveryData(Record record){
+    public void recoveryData(Record record, Context context){
         resetData();
         SecurePasswordManager.setLoginWithPassword(true);
         SecurePasswordManager.savePassword(record.getKirinNoodlesBackup().getPassword());
 
-        List<Dish> dishes = record.getKirinNoodlesBackup().getDishDtos().stream().map(dishDto -> dishDto.mapFromDto(context)).collect(Collectors.toList());
+        List<Dish> dishes = record.getKirinNoodlesBackup().getDishDtos().stream().map(dishDto -> dishDto.mapFromDto(context.getApplicationContext())).collect(Collectors.toList());
         List<TableLocation> tableLocations = record.getKirinNoodlesBackup().getTableLocationDtos().stream().map(TableLocationDto::mapFromDto).collect(Collectors.toList());
         List<Invoice> invoices = record.getKirinNoodlesBackup().getInvoiceDtos().stream().map(InvoiceDto::mapFromDto).collect(Collectors.toList());
         List<OrderedDish> orderedDishes = record.getKirinNoodlesBackup().getOrderedDishDtos().stream().map(OrderedDishDto::mapFromDto).collect(Collectors.toList());

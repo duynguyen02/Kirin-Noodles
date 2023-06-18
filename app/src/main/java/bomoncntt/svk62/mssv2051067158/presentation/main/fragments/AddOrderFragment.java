@@ -206,7 +206,7 @@ public class AddOrderFragment  extends Fragment {
         TableLocation _tableLocation = order.getTableLocation();
         String finalBillString = "Bàn: " +
                 (_tableLocation == null ? "Mang Đi" : _tableLocation.getTableName()) + "\n" +
-                "Thời giản lên đơn: " +
+                "Thời gian lên đơn: " +
                 DateHelper.dataToStringConverter(invoice.getOrderTime()) +
                 "\n\n" +
                 foodStringBuilder + "Tổng: " + CurrencyHelper.currencyConverter(order.getOrderTotalPrice());
