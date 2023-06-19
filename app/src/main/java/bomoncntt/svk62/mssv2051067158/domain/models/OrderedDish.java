@@ -5,12 +5,22 @@ public class OrderedDish {
     private int quantity;
     private String note;
     private int invoiceID;
+    private double price;
 
-    public OrderedDish(int dishID, int quantity, String note, int invoiceID) {
+    public OrderedDish(int dishID, int quantity, String note, int invoiceID, double price) {
         this.dishID = dishID;
         this.quantity = quantity;
         this.note = note;
         this.invoiceID = invoiceID;
+        this.price = price;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public int getDishID() {

@@ -26,8 +26,8 @@ public class KirinNoodlesSQLiteHelper extends SQLiteOpenHelper {
 
         String createDishTableQuery = "CREATE TABLE Dish (DishID INTEGER PRIMARY KEY, DishName TEXT, Price REAL, ImageLocation TEXT)";
         String createTableTableQuery = "CREATE TABLE TableLocation (TableID INTEGER PRIMARY KEY, TableName TEXT)";
-        String createInvoiceTableQuery = "CREATE TABLE Invoice (InvoiceID INTEGER PRIMARY KEY, Total REAL, OrderTime DATETIME, TableID INTEGER, PaymentStatus TEXT CHECK (PaymentStatus IN ('preparing', 'waiting_for_payment', 'paid')), FOREIGN KEY (TableID) REFERENCES TableLocation(TableID) ON DELETE RESTRICT)";
-        String createOrderedDishTableQuery = "CREATE TABLE OrderedDish (DishID INTEGER, Quantity INTEGER, Note TEXT, InvoiceID INTEGER, PRIMARY KEY (DishID,InvoiceID), FOREIGN KEY (DishID) REFERENCES Dish(DishID), FOREIGN KEY (InvoiceID) REFERENCES Invoice(InvoiceID) ON DELETE RESTRICT)";
+        String createInvoiceTableQuery = "CREATE TABLE Invoice (InvoiceID INTEGER PRIMARY KEY, Total REAL, OrderTime DATETIME, TableID INTEGER, PaymentStatus TEXT CHECK (PaymentStatus IN ('preparing', 'waiting_for_payment', 'paid', 'cancel')), FOREIGN KEY (TableID) REFERENCES TableLocation(TableID) ON DELETE RESTRICT)";
+        String createOrderedDishTableQuery = "CREATE TABLE OrderedDish (DishID INTEGER, Quantity INTEGER, Price REAL, Note TEXT, InvoiceID INTEGER, PRIMARY KEY (DishID,InvoiceID), FOREIGN KEY (DishID) REFERENCES Dish(DishID), FOREIGN KEY (InvoiceID) REFERENCES Invoice(InvoiceID) ON DELETE RESTRICT)";
 
         db.execSQL(createDishTableQuery);
         db.execSQL(createTableTableQuery);

@@ -229,8 +229,9 @@ public class ResourcesManagementFragment extends Fragment {
             new FoodManagerDialogFragment(new OnItemChangedListener<Dish>() {
                 @Override
                 public void onItemAdded(Dish newDish) {
-                    dishAdapter.add(newDish);
-                    dishAdapter.notifyDataSetChanged();
+//                    dishAdapter.add(newDish);
+//                    dishAdapter.notifyDataSetChanged();
+                    foodsListviewSetup();
                 }
 
                 @Override
@@ -244,8 +245,9 @@ public class ResourcesManagementFragment extends Fragment {
             new TableManagerDialogFragment(new OnItemChangedListener<TableLocation>() {
                 @Override
                 public void onItemAdded(TableLocation tableLocation) {
-                    tableLocationAdapter.add(tableLocation);
-                    tableLocationAdapter.notifyDataSetChanged();
+//                    tableLocationAdapter.add(tableLocation);
+//                    tableLocationAdapter.notifyDataSetChanged();
+                    tableLocationSetup();
                 }
 
                 @Override

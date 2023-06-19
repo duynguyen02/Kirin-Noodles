@@ -13,12 +13,23 @@ public class OrderedDishDto {
     private String note;
     @SerializedName("InvoiceID")
     private int invoiceID;
+    @SerializedName("Price")
+    private double price;
 
-    public OrderedDishDto(int dishID, int quantity, String note, int invoiceID) {
+    public OrderedDishDto(int dishID, int quantity, String note, int invoiceID, double price) {
         this.dishID = dishID;
         this.quantity = quantity;
         this.note = note;
         this.invoiceID = invoiceID;
+        this.price = price;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public static OrderedDishDto mapToDto(OrderedDish orderedDish){
@@ -26,7 +37,8 @@ public class OrderedDishDto {
                 orderedDish.getDishID(),
                 orderedDish.getQuantity(),
                 orderedDish.getNote(),
-                orderedDish.getInvoiceID()
+                orderedDish.getInvoiceID(),
+                orderedDish.getPrice()
         );
     }
 
@@ -35,7 +47,8 @@ public class OrderedDishDto {
                 dishID,
                 quantity,
                 note,
-                invoiceID
+                invoiceID,
+                price
         );
     }
 

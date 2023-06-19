@@ -140,7 +140,7 @@ public class FoodsOrderedAdapter extends BaseAdapter {
             }
 
             foodsOrderedAdapter.order.getOrderMap().put(dish, new OrderedDish(
-                    dish.getDishID(), Integer.parseInt(quantity), note, -1
+                    dish.getDishID(), Integer.parseInt(quantity), note, -1, dish.getPrice()
             ));
 
             foodsOrderedAdapter.isChecked.set(foodsOrderedAdapter.dishes.indexOf(dish), true);

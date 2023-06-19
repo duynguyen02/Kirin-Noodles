@@ -34,6 +34,7 @@ public class OrderedDishRepositoryImpl implements OrderedDishRepository {
         values.put("DishID", orderedDish.getDishID());
         values.put("Quantity", orderedDish.getQuantity());
         values.put("Note", orderedDish.getNote());
+        values.put("Price", orderedDish.getPrice());
         values.put("InvoiceID", orderedDish.getInvoiceID());
 
         long result = database.insert("OrderedDish", null, values);
@@ -58,8 +59,9 @@ public class OrderedDishRepositoryImpl implements OrderedDishRepository {
             int id = cursor.getInt(cursor.getColumnIndex("DishID"));
             int quantity = cursor.getInt(cursor.getColumnIndex("Quantity"));
             String note = cursor.getString(cursor.getColumnIndex("Note"));
+            double price = cursor.getDouble(cursor.getColumnIndex("Price"));
 
-            OrderedDish orderedDish = new OrderedDish(id, quantity, note, invoiceID);
+            OrderedDish orderedDish = new OrderedDish(id, quantity, note, invoiceID, price);
             orderedDishes.add(orderedDish);
         }
 
@@ -87,7 +89,8 @@ public class OrderedDishRepositoryImpl implements OrderedDishRepository {
             int quantity = cursor.getInt(cursor.getColumnIndex("Quantity"));
             String note = cursor.getString(cursor.getColumnIndex("Note"));
             int invoiceID = cursor.getInt(cursor.getColumnIndex("InvoiceID"));
-            OrderedDish orderedDish = new OrderedDish(id, quantity, note, invoiceID);
+            double price = cursor.getDouble(cursor.getColumnIndex("Price"));
+            OrderedDish orderedDish = new OrderedDish(id, quantity, note, invoiceID, price);
             orderedDishes.add(orderedDish);
         }
 

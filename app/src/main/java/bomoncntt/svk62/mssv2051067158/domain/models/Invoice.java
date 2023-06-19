@@ -15,7 +15,8 @@ public class Invoice {
 
         PREPARING("preparing"),
         WAITING_FOR_PAYMENT("waiting_for_payment"),
-        PAID("paid");
+        PAID("paid"),
+        CANCEL("cancel");
 
         private final String value;
 

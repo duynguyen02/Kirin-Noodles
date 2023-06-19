@@ -113,6 +113,10 @@ public class OrderAdapter extends BaseAdapter {
                 binding.ivOrderLviPaymentStatus.setImageResource(R.drawable.money);
                 break;
             }
+            case CANCEL:{
+                binding.ivOrderLviPaymentStatus.setImageResource(R.drawable.cancel_order);
+                break;
+            }
         }
 
         binding.cbOrderLviChecked.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -177,7 +181,11 @@ public class OrderAdapter extends BaseAdapter {
             paymentStatus = Invoice.PaymentStatus.WAITING_FOR_PAYMENT;
         } else if (invoice.getPaymentStatus() == Invoice.PaymentStatus.WAITING_FOR_PAYMENT) {
             paymentStatus = Invoice.PaymentStatus.PAID;
-        } else {
+        }
+        else if (invoice.getPaymentStatus() == Invoice.PaymentStatus.PAID) {
+            paymentStatus = Invoice.PaymentStatus.CANCEL;
+        }
+        else {
             paymentStatus = Invoice.PaymentStatus.PREPARING;
         }
         invoice.setPaymentStatus(paymentStatus);
@@ -200,7 +208,7 @@ public class OrderAdapter extends BaseAdapter {
                     .append(orderedDish.getQuantity())
                     .append("\n")
                     .append("Giá: ")
-                    .append(CurrencyHelper.currencyConverter((double) orderedDish.getQuantity() * dish.getPrice()))
+                    .append(CurrencyHelper.currencyConverter((double) orderedDish.getQuantity() * orderedDish.getPrice()))
                     .append("\n")
                     .append("Ghi chú: ")
                     .append(orderedDish.getNote())
@@ -221,6 +229,9 @@ public class OrderAdapter extends BaseAdapter {
                 paymentStatus = "Đã thanh toán!";
                 break;
             }
+            case CANCEL:{
+                paymentStatus = "Đã hủy";
+            }
         }
 
 
@@ -231,8 +242,7 @@ public class OrderAdapter extends BaseAdapter {
                 DateHelper.dataToStringConverter(invoice.getOrderTime()) + "\n" +
                 "Trạng thái: " + paymentStatus +
                 "\n\n" +
-                foodStringBuilder + "Tổng: " + CurrencyHelper.currencyConverter(invoice.getTotal()) + "\n" +
-                "Giá tổng hóa đơn có thể khác giá sản phẩm do giá sản phẩm đã thay đổi sau khi đã lên đơn.";
+                foodStringBuilder + "Tổng: " + CurrencyHelper.currencyConverter(invoice.getTotal());
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(fragmentActivity);
         builder.setTitle("Chi Tiết Hóa Đơn")
